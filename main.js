@@ -2,6 +2,7 @@
 
 import {Parser, NamedNode, Store, Writer, Quad, DataFactory} from 'n3'
 import {createReadStream} from 'node:fs'
+import {Readable} from 'node:stream'
 import {QueryEngine} from '@comunica/query-sparql-rdfjs'
 
 const {quad, namedNode, defaultGraph} = DataFactory
@@ -12,7 +13,9 @@ const prefixes = {}
 const myEngine = new QueryEngine()
 
 const parser = new Parser()
-const rdfStream = createReadStream('../dasein-online/resources/specs.ttl')
+const source = await fetch(new URL('https://raw.githubusercontent.com/aljedaxi/dasein-online/refs/heads/main/resources/specs.ttl'))
+// const rdfStream = createReadStream('path to source file')
+const rdfStream = Readable.fromWeb(source.body)
 const store = await new Promise((res, rej) => {
     const store = new Store()
     parser.parse(rdfStream, (error, quad, fixes) => {
